@@ -187,6 +187,7 @@ schema:
   Eprediction:
     energy_demand_sensor: str
     outside_temperature_sensor: str
+    outside_temperature_sensor_measurement: str
     timezone: str
     influxdb_ip: str
     influxdb_port: int

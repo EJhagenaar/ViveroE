@@ -115,7 +115,7 @@ class Eoptimization:
         self.edata['weekday'] = self.edata.index.weekday
         self.edata['hour'] = self.edata.index.hour
         #get temperature data
-        tdata=self.influxclient.query('SELECT mean("value") as temperature, time as time from "°C" WHERE "entity_id"=\''+self.influxconfig['outside_temperature_sensor']+'\' and time <= now() and time >= now() - 365d GROUP BY time(1h)')['°C']
+        tdata=self.influxclient.query('SELECT mean("value") as temperature, time as time from "°" WHERE "entity_id"=\''+self.influxconfig['outside_temperature_sensor']+'\' and time <= now() and time >= now() - 365d GROUP BY time(1h)')['°C']
         tdata.index.name='time'
         tdata.index = tdata.index.tz_convert(self.influxconfig['timezone'])
         tdata = tdata.asfreq('H', fill_value=15.0).sort_index()

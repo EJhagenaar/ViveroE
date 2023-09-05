@@ -79,6 +79,7 @@ options:
   Eprediction:
     energy_demand_sensor: 'inverter_output_total'
     outside_temperature_sensor: 'openweathermap_temperature'
+    outside_temperature_sensor_measurement: "°C"
     timezone: 'Europe/Amsterdam'
     influxdb_ip: '192.168.2.101'
     influxdb_port: 8086

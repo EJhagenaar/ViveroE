@@ -116,21 +116,21 @@ class Eoptimization:
         #get consumption
         self.edata=self.getfromInflux('edata')
         print(self.edata)
-        self.edata.index.name='time'
-        self.edata.index = self.edata.index.tz_convert(self.influxconfig['timezone'])
-        self.edata = self.edata.asfreq('H', fill_value=0.0).sort_index()
-        self.edata['weekday'] = self.edata.index.weekday
-        self.edata['hour'] = self.edata.index.hour
-        #get temperature data
-        tdata=self.getfromInflux('tdata')
-        tdata.index = tdata.index.tz_convert(self.influxconfig['timezone'])
-        tdata = tdata.asfreq('H', fill_value=15.0).sort_index()
-        self.edata = self.edata.join(tdata, how='left')
-        self.edata['temperature']=self.edata['temperature'].fillna(0.0)
-        #add holiday data
-        self.edata['holiday']=0
-        for row in self.config['Holiday']:
-            self.edata.loc[row['start']:row['end'],"holiday"]=1
+#        self.edata.index.name='time'
+#        self.edata.index = self.edata.index.tz_convert(self.influxconfig['timezone'])
+#        self.edata = self.edata.asfreq('H', fill_value=0.0).sort_index()
+#        self.edata['weekday'] = self.edata.index.weekday
+#        self.edata['hour'] = self.edata.index.hour
+#        #get temperature data
+#        tdata=self.getfromInflux('tdata')
+#        tdata.index = tdata.index.tz_convert(self.influxconfig['timezone'])
+#        tdata = tdata.asfreq('H', fill_value=15.0).sort_index()
+#        self.edata = self.edata.join(tdata, how='left')
+#        self.edata['temperature']=self.edata['temperature'].fillna(0.0)
+#        #add holiday data
+#        self.edata['holiday']=0
+#        for row in self.config['Holiday']:
+#            self.edata.loc[row['start']:row['end'],"holiday"]=1
 
     #plot edata if necessary
     def plotEdata(self):

@@ -46,7 +46,7 @@ class Eoptimization:
         if self.influxconfig['influxdb_version'] == 1:
             self.influxclient = DataFrameClient(host=self.influxconfig['influxdb_ip'], port=self.influxconfig['influxdb_port'], username=self.influxconfig['influxdb_username'], password=self.influxconfig['influxdb_password'], database=self.influxconfig['influxdb_database'])
         else:
-            self.influxclient = InfluxDBClient(url=self.influxconfig['influxdb_ip']+self.influxconfig['influxdb_port'], token=self.influxconfig['influxdb_token'], org=self.influxconfig['organization'])
+            self.influxclient = InfluxDBClient(url=self.influxconfig['influxdb_ip']+self.influxconfig['influxdb_port'], token=self.influxconfig['influxdb_token'], org=self.influxconfig['influxdb_organization'])
             self.query_api = self.influxclient.query_api()
         self.dayondayprice = 0.0
         self.calculatedat = datetime.now()

@@ -1,6 +1,6 @@
 name: "Vivero E-optimization"
 description: "addon which supplies several API endpoints for optimizing and monitoring a home battery PV system in the Netherlands"
-version: "0.1.26.2"
+version: "0.1.26.3"
 slug: "e-opti"
 init: false
 arch:
@@ -193,7 +193,7 @@ schema:
     outside_temperature_sensor: str
     timezone: str
     influxdb_ip: str
-    influxdb_port: int
+    influxdb_port: str
     influxdb_username: str
     influxdb_password: str
     influxdb_database: str

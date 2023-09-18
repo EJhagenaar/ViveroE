@@ -64,7 +64,7 @@ def calculate():
   #  except:
   #      return {"status": "Error trying to greate dataframe from previous input"}     
     
-    return Response(Eopti.Optimization.to_json(orient="index"), media_type="application/json")
+ #   return Response(Eopti.Optimization.to_json(orient="index"), media_type="application/json")
 
 @app.get("/plot/{number}")
 def plot(number):

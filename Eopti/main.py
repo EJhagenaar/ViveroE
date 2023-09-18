@@ -33,20 +33,20 @@ def root():
 
 @app.get("/calculate")
 def calculate():
-    try:
-        Eopti.loadPVForecast()
-    except:
-        return {"status": "Error trying to load PV Forecast"}
+#    try:
+#        Eopti.loadPVForecast()
+#    except:
+#        return {"status": "Error trying to load PV Forecast"}
     
-    try:
-        Eopti.loadPrices()
-    except:
-        return {"status": "Error trying to load prices from entso-e platform"}
+#    try:
+#        Eopti.loadPrices()
+#    except:
+#        return {"status": "Error trying to load prices from entso-e platform"}
     
-    try:
-        Eopti.getTempForecast()
-    except:
-        return {"status": "Error trying to get temperature forecast from OpenWeatherMap"}   
+#    try:
+#        Eopti.getTempForecast()
+#    except:
+#        return {"status": "Error trying to get temperature forecast from OpenWeatherMap"}   
 
     try:
         Eopti.loadEdata()
@@ -58,25 +58,25 @@ def calculate():
     except:
         return {"status": "Error trying to get future external variables"}  
 
-    try:
-        Eopti.forecastEdata(backtest=0,plot=0)
-    except:
-        return {"status": "Error trying to create forecast data for energy"} 
+ #   try:
+ #       Eopti.forecastEdata(backtest=0,plot=0)
+ #   except:
+ #       return {"status": "Error trying to create forecast data for energy"} 
     
-    try:
-        Eopti.createOptInput()
-    except:
-        return {"status": "Error trying to greate dataframe from previous input"} 
+ #   try:
+ #       Eopti.createOptInput()
+ #   except:
+ #       return {"status": "Error trying to greate dataframe from previous input"} 
 
-    try:
-        Eopti.priceForecast()
-    except:
-        return {"status": "Error trying to get price forecast >24h ahead from "} 
+ #   try:
+ #       Eopti.priceForecast()
+ #   except:
+ #       return {"status": "Error trying to get price forecast >24h ahead from "} 
     
-    try:
-        Eopti.createOptimization(smartSOC=1)
-    except:
-        return {"status": "Error trying to greate dataframe from previous input"}     
+  #  try:
+  #      Eopti.createOptimization(smartSOC=1)
+  #  except:
+  #      return {"status": "Error trying to greate dataframe from previous input"}     
     
     return Response(Eopti.Optimization.to_json(orient="index"), media_type="application/json")
 

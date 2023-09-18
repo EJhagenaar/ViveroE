@@ -115,6 +115,7 @@ class Eoptimization:
     def loadEdata(self):
         #get consumption
         self.edata=self.getfromInflux('edata')
+        print(self.edata)
         self.edata.index.name='time'
         self.edata.index = self.edata.index.tz_convert(self.influxconfig['timezone'])
         self.edata = self.edata.asfreq('H', fill_value=0.0).sort_index()
@@ -625,17 +626,17 @@ class Eoptimization:
                 return self.influxclient.query('SELECT mean("value") as SOCact, time as time from "%" WHERE "entity_id"=\''+self.config['Sensors']['SOC']+'\' and time <= now() and time >= now() - 2d GROUP BY time(1h)')['%']
         if self.influxconfig['influxdb_version'] == 2:
             if value == 'edata':
-                return 1
+                return self.influxclient.query_api(from(bucket: "homeassistant")|> range(start: -365d, stop: now())|> filter(fn: (r) => r["_measurement"] == "W")|> filter(fn: (r) => r["_field"] == "value")|> filter(fn: (r) => r["domain"] == "sensor")|> filter(fn: (r) => r["entity_id"] == \''+self.influxconfig['energy_demand_sensor']+'\')|> aggregateWindow(every: 1h, fn: integral, createEmpty: false)|> yield(name: "Consumption"))
             elif value == 'tdata':
-                return 1
+                return self.influxclient.query_api(from(bucket: "homeassistant")|> range(start: -365d, stop: now())|> filter(fn: (r) => r["_measurement"] == "°C")|> filter(fn: (r) => r["_field"] == "value")|> filter(fn: (r) => r["domain"] == "sensor")|> filter(fn: (r) => r["entity_id"] == \''+self.influxconfig['outside_temperature_sensor']+'\')|> aggregateWindow(every: 1h, fn: mean, createEmpty: false)|> yield(name: "temperature"))
             elif value == 'consumption':
-                return 1
+                return self.influxclient.query_api(from(bucket: "homeassistant")|> range(start: -2d, stop: now())|> filter(fn: (r) => r["_measurement"] == "W")|> filter(fn: (r) => r["_field"] == "value")|> filter(fn: (r) => r["domain"] == "sensor")|> filter(fn: (r) => r["entity_id"] == \''+self.config['Sensors']['Consumption']+'\')|> aggregateWindow(every: 1h, fn: integral, createEmpty: false)|> yield(name: "Consumption"))
             elif value == 'PV':
-                return 1
+                return self.influxclient.query_api(from(bucket: "homeassistant")|> range(start: -2d, stop: now())|> filter(fn: (r) => r["_measurement"] == "W")|> filter(fn: (r) => r["_field"] == "value")|> filter(fn: (r) => r["domain"] == "sensor")|> filter(fn: (r) => r["entity_id"] == \''+self.config['Sensors']['PV']+'\')|> aggregateWindow(every: 1h, fn: integral, createEmpty: false)|> yield(name: "PVreal"))
             elif value == 'GRID':
-                return 1
+                return self.influxclient.query_api(from(bucket: "homeassistant")|> range(start: -2d, stop: now())|> filter(fn: (r) => r["_measurement"] == "W")|> filter(fn: (r) => r["_field"] == "value")|> filter(fn: (r) => r["domain"] == "sensor")|> filter(fn: (r) => r["entity_id"] == \''+self.config['Sensors']['GRID']+'\')|> aggregateWindow(every: 1h, fn: integral, createEmpty: false)|> yield(name: "GRID"))
             elif value == 'SOC':
-                return 1
+                return self.influxclient.query_api(from(bucket: "homeassistant")|> range(start: -2d, stop: now())|> filter(fn: (r) => r["_measurement"] == "%")|> filter(fn: (r) => r["_field"] == "value")|> filter(fn: (r) => r["domain"] == "sensor")|> filter(fn: (r) => r["entity_id"] == \''+self.config['Sensors']['SOC']+'\')|> aggregateWindow(every: 1h, fn: mean, createEmpty: false)|> yield(name: "SOCact"))
 
 
 

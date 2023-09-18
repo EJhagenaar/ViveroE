@@ -33,20 +33,20 @@ def root():
 
 @app.get("/calculate")
 def calculate():
-    try:
-        Eopti.loadPVForecast()
-    except:
-        return {"status": "Error trying to load PV Forecast"}
+#    try:
+#        Eopti.loadPVForecast()
+#    except:
+#        return {"status": "Error trying to load PV Forecast"}
     
-    try:
-        Eopti.loadPrices()
-    except:
-        return {"status": "Error trying to load prices from entso-e platform"}
+#    try:
+#        Eopti.loadPrices()
+#    except:
+#        return {"status": "Error trying to load prices from entso-e platform"}
     
-    try:
-        Eopti.getTempForecast()
-    except:
-        return {"status": "Error trying to get temperature forecast from OpenWeatherMap"}   
+#    try:
+#        Eopti.getTempForecast()
+#    except:
+#        return {"status": "Error trying to get temperature forecast from OpenWeatherMap"}   
 
     try:
         Eopti.loadEdata()

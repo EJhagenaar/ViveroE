@@ -42,8 +42,8 @@ def calculate():
     
     try:
         Eopti.getExogFut()
-    except:
-        return {"status": "Error trying to get future external variables"}  
+    except Exception as error:
+        return {"status": "Error trying to get future external variables"}, error  
 
  #   try:
  #       Eopti.forecastEdata(backtest=0,plot=0)

@@ -632,11 +632,12 @@ class Eoptimization:
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
-                |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
+                |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "consumption"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['W']
+                result = self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
+                return result["time"]["consumption"]
             elif value == 'tdata':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -365d, stop: now())\

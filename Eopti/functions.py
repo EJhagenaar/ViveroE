@@ -638,7 +638,7 @@ class Eoptimization:
                 results = []
                 for table in result:
                   for record in table.records:
-                    results.append((record.values.get("_time"), record.values.get("_value")))
+                    results.append(record["_time"], record.["_value"])
                 print(results)
                 return results
             elif value == 'tdata':

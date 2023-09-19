@@ -637,6 +637,7 @@ class Eoptimization:
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "consumption"})'
                 result = self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
+                print(result)
                 return result["time"]["consumption"]
             elif value == 'tdata':
                 query = 'from(bucket: "homeassistant")\

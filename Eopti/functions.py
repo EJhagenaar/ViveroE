@@ -634,12 +634,14 @@ class Eoptimization:
                 |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
-                |> keep(columns: ["_time", "_value"])\
-                |> rename(columns: {_time: "time", _value: "consumption"})'
+      #          |> keep(columns: ["_time", "_value"])\
+      #          |> rename(columns: {_time: "time", _value: "consumption"})'
                 result = self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
-                print(result)
-                
-                return result["consumption"]
+                for table in result:
+                  for record in table.records:
+                    results.append((record.get_time(), record.get_value()))
+                print(results)
+                return results
             elif value == 'tdata':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -365d, stop: now())\

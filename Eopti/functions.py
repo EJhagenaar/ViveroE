@@ -115,7 +115,6 @@ class Eoptimization:
     def loadEdata(self):
         #get consumption
         self.edata=self.getfromInflux('edata')
-        print(self.getfromInflux('edata'))
         self.edata.index.name='time'
         self.edata.index = self.edata.index.tz_convert(self.influxconfig['timezone'])
         self.edata = self.edata.asfreq('H', fill_value=0.0).sort_index()
@@ -626,17 +625,7 @@ class Eoptimization:
                 return self.influxclient.query('SELECT mean("value") as SOCact, time as time from "%" WHERE "entity_id"=\''+self.config['Sensors']['SOC']+'\' and time <= now() and time >= now() - 2d GROUP BY time(1h)')['%']
         if self.influxconfig['influxdb_version'] == 2:
             if value == 'edata':
-                query = '''
-                from(bucket: "homeassistant")
-                        |> range(start: -365d, stop: now())
-                        |> filter(fn: (r) => r["_measurement"] == "W")
-                        |> filter(fn: (r) => r["_field"] == "value")
-                        |> filter(fn: (r) => r["domain"] == "sensor")
-                        |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")
-                        |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)
-                        |> yield(name: "Consumption")
-                    '''
-                return self.influxclient.query_api(query)
+                return self.query_api.query('from(bucket: "homeassistant")|> range(start: -365d, stop: now())|> filter(fn: (r) => r["_measurement"] == "W")|> filter(fn: (r) => r["_field"] == "value")|> filter(fn: (r) => r["domain"] == "sensor")|> filter(fn: (r) => r["entity_id"] == "inverter_output_total")|> aggregateWindow(every: 1h, fn: integral, createEmpty: false)|> yield(name: "Consumption")')
             elif value == 'tdata':
                 query = '''
                 from(bucket: "homeassistant")

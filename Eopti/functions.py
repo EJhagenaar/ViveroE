@@ -633,7 +633,7 @@ class Eoptimization:
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
-                |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
+                |> map(fn: (r) => ({r with _value: r._value / 1000.0}))'
       #          |> keep(columns: ["_time", "_value"])\
       #          |> rename(columns: {_time: "time", _value: "consumption"})'
                 result = self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
@@ -649,10 +649,15 @@ class Eoptimization:
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "weatherxm_temperature_celsius")\
-                |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
-                |> keep(columns: ["_time", "_value"])\
-                |> rename(columns: {_time: "time", _value: "temperature"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['°C']
+                |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)'
+#                |> keep(columns: ["_time", "_value"])\
+#                |> rename(columns: {_time: "time", _value: "temperature"})'
+                result = self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
+                for table in result:
+                  for record in table.records:
+                    results.append((record.get_time(), record.get_value()))
+                print(results)
+                return results
             elif value == 'consumption':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -2d, stop: now())\

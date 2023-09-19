@@ -639,7 +639,7 @@ class Eoptimization:
                 for table in result:
                     for record in table.records:
                         results = [record.get_value("_time"),record.get_value("_value")]
-                return results
+                return result.to_json(indent=5)
             elif value == 'tdata':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -365d, stop: now())\
@@ -657,6 +657,10 @@ class Eoptimization:
                     results.append((record.get_time(), record.get_value()))
                 print(results)
                 return results
+                _data_frame = pd.DataFrame(data=[["coyote_creek", 1.0], ["coyote_creek", 2.0]],
+                           index=[_now, _now + timedelta(hours=1)],
+                           columns=["location", "water_level"])
+            
             elif value == 'consumption':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -2d, stop: now())\

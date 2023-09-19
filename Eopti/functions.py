@@ -637,6 +637,7 @@ class Eoptimization:
       #          |> keep(columns: ["_time", "_value"])\
       #          |> rename(columns: {_time: "time", _value: "consumption"})'
                 result = self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
+                results = []
                 for table in result:
                   for record in table.records:
                     results.append((record.get_time(), record.get_value()))
@@ -653,6 +654,7 @@ class Eoptimization:
 #                |> keep(columns: ["_time", "_value"])\
 #                |> rename(columns: {_time: "time", _value: "temperature"})'
                 result = self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
+                results = []
                 for table in result:
                   for record in table.records:
                     results.append((record.get_time(), record.get_value()))

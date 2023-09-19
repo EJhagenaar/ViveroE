@@ -637,9 +637,11 @@ class Eoptimization:
                 result = self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
                 results = []
                 for table in result:
+                    print("table.records = ",table.records)
                     for record in table.records:
-                        results[record] = [record.get_value("_time"),record.get_value("_value")]
-                print(results)
+                        print(record)
+                        #results[record] = [record.get_value("_time"),record.get_value("_value")]
+                #print(results["W"])
                 return results
             elif value == 'tdata':
                 query = 'from(bucket: "homeassistant")\

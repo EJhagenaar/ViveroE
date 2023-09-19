@@ -625,7 +625,7 @@ class Eoptimization:
                 return self.influxclient.query('SELECT mean("value") as SOCact, time as time from "%" WHERE "entity_id"=\''+self.config['Sensors']['SOC']+'\' and time <= now() and time >= now() - 2d GROUP BY time(1h)')['%']
         if self.influxconfig['influxdb_version'] == 2:
             if value == 'edata':
-                self.test = self.query_api.query('from(bucket: "homeassistant")|> range(start: -365d, stop: now())|> filter(fn: (r) => r["_measurement"] == "W")|> filter(fn: (r) => r["_field"] == "value")|> filter(fn: (r) => r["domain"] == "sensor")|> filter(fn: (r) => r["entity_id"] == "inverter_output_total")|> aggregateWindow(every: 1h, fn: integral, createEmpty: false)|> yield(name: "Consumption")'))
+                self.test = self.query_api.query('from(bucket: "homeassistant")|> range(start: -365d, stop: now())|> filter(fn: (r) => r["_measurement"] == "W")|> filter(fn: (r) => r["_field"] == "value")|> filter(fn: (r) => r["domain"] == "sensor")|> filter(fn: (r) => r["entity_id"] == "inverter_output_total")|> aggregateWindow(every: 1h, fn: integral, createEmpty: false)|> yield(name: "Consumption")')
                 print(f"Train dates      : self.test")
                 return self.test
             elif value == 'tdata':

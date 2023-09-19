@@ -632,6 +632,7 @@ class Eoptimization:
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
+                |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "consumption"})'
@@ -654,6 +655,7 @@ class Eoptimization:
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
+                |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "Consumption"})'
@@ -665,6 +667,7 @@ class Eoptimization:
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "pv_ac_power")\
+                |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "PVreal"})'
@@ -676,6 +679,7 @@ class Eoptimization:
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "grid_total_power")\
+                |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "GRID"})'

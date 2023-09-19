@@ -637,8 +637,9 @@ class Eoptimization:
                 result = self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
                 results = []
                 for table in result:
-                  for record in table.records:
-                    results[record["_time"]]
+                    print(table)
+                    for record in table.records:
+                        results[record["_time"]]
                 print(results)
                 return results
             elif value == 'tdata':

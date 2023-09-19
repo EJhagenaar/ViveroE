@@ -116,7 +116,7 @@ class Eoptimization:
         #get consumption
         self.edata=self.getfromInflux('edata')
         print(self.edata)
-        self.edata.index.name='_time'
+        self.edata.index.name='time'
         self.edata.index = self.edata.index.tz_convert(self.influxconfig['timezone'])
         self.edata = self.edata.asfreq('H', fill_value=0.0).sort_index()
         self.edata['weekday'] = self.edata.index.weekday
@@ -633,7 +633,8 @@ class Eoptimization:
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
-                |> yield(name: "Consumption")'
+                |> keep(columns: ["_time", "_value"])\
+                |> rename(columns: {_time: "time", _value: "consumption"})'
                 return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
             elif value == 'tdata':
                 query = 'from(bucket: "homeassistant")\
@@ -643,7 +644,8 @@ class Eoptimization:
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "weatherxm_temperature_celsius")\
                 |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
-                |> yield(name: "temperature")'
+                |> keep(columns: ["_time", "_value"])\
+                |> rename(columns: {_time: "time", _value: "temperature"})'
                 return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
             elif value == 'consumption':
                 query = 'from(bucket: "homeassistant")\
@@ -653,7 +655,8 @@ class Eoptimization:
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
-                |> yield(name: "Consumption")'
+                |> keep(columns: ["_time", "_value"])\
+                |> rename(columns: {_time: "time", _value: "Consumption"})'
                 return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
             elif value == 'PV':
                 query = 'from(bucket: "homeassistant")\
@@ -663,7 +666,8 @@ class Eoptimization:
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "pv_ac_power")\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
-                |> yield(name: "PVreal")'
+                |> keep(columns: ["_time", "_value"])\
+                |> rename(columns: {_time: "time", _value: "PVreal"})'
                 return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
             elif value == 'GRID':
                 query = 'from(bucket: "homeassistant")\
@@ -673,7 +677,8 @@ class Eoptimization:
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "grid_total_power")\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
-                |> yield(name: "GRID")'
+                |> keep(columns: ["_time", "_value"])\
+                |> rename(columns: {_time: "time", _value: "GRID"})'
                 return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
             elif value == 'SOC':
                 query = 'from(bucket: "homeassistant")\
@@ -683,5 +688,6 @@ class Eoptimization:
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "victron_battery_soc_223")\
                 |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
-                |> yield(name: "SOCact")'
+                |> keep(columns: ["_time", "_value"])\
+                |> rename(columns: {_time: "time", _value: "SOCact"})'
                 return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)

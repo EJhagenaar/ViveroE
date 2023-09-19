@@ -641,9 +641,9 @@ class Eoptimization:
                 results = []
                 for table in result:
                     print(table)
-                  for record in table.records:
-                    print(record)
-                    results = [record._time,record.consumption]
+                    for record in table.records:
+                        print(record)
+                        results = [record._time,record.consumption]
                 print(results)
                 return results
             elif value == 'tdata':

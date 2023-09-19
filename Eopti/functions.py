@@ -636,7 +636,7 @@ class Eoptimization:
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "consumption"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['W']
             elif value == 'tdata':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -365d, stop: now())\
@@ -647,7 +647,7 @@ class Eoptimization:
                 |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "temperature"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['°C']
             elif value == 'consumption':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -2d, stop: now())\
@@ -659,7 +659,7 @@ class Eoptimization:
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "Consumption"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['W']
             elif value == 'PV':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -2d, stop: now())\
@@ -671,7 +671,7 @@ class Eoptimization:
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "PVreal"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['W']
             elif value == 'GRID':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -2d, stop: now())\
@@ -683,7 +683,7 @@ class Eoptimization:
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "GRID"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['W']
             elif value == 'SOC':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -2d, stop: now())\
@@ -694,4 +694,4 @@ class Eoptimization:
                 |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "SOCact"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['%']

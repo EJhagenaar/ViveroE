@@ -638,10 +638,11 @@ class Eoptimization:
                 |> keep(columns: ["_time","value"])\
                 |> rename(columns: {value: "consumption"})'    
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
-                print(result)
                 results = []
                 for table in result:
+                    print(table)
                   for record in table.records:
+                    print(record)
                     results = [record._time,record.consumption]
                 print(results)
                 return results

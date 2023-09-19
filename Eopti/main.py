@@ -37,7 +37,10 @@ def calculate():
     try:
         Eopti.loadEdata()
     except:
-        return {"status": "Error trying to load historical energy data from HA sensor and influxDB"}     
+    except Exception as error:
+        # handle the exception
+        p
+        return {"status": "Error trying to load historical energy data from HA sensor and influxDB"}, error     
     
     try:
         Eopti.getExogFut()

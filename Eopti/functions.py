@@ -639,7 +639,12 @@ class Eoptimization:
                 |> rename(columns: {value: "consumption"})'    
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
                 print(result)
-                return result
+                results = []
+                for table in result:
+                  for record in table.records:
+                    results[record] = record.consumption
+                print(results)
+                return results
             elif value == 'tdata':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -365d, stop: now())\

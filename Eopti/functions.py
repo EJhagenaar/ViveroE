@@ -625,66 +625,62 @@ class Eoptimization:
                 return self.influxclient.query('SELECT mean("value") as SOCact, time as time from "%" WHERE "entity_id"=\''+self.config['Sensors']['SOC']+'\' and time <= now() and time >= now() - 2d GROUP BY time(1h)')['%']
         if self.influxconfig['influxdb_version'] == 2:
             if value == 'edata':
-                self.test = self.query_api.query('from(bucket: "homeassistant")|> range(start: -365d, stop: now())|> filter(fn: (r) => r["_measurement"] == "W")|> filter(fn: (r) => r["_field"] == "value")|> filter(fn: (r) => r["domain"] == "sensor")|> filter(fn: (r) => r["entity_id"] == "inverter_output_total")|> aggregateWindow(every: 1h, fn: integral, createEmpty: false)|> yield(name: "Consumption")')
-                print(f"Train dates      : self.test")
-                return self.test
+                query = 'from(bucket: "homeassistant")\
+                |> range(start: -365d, stop: now())\
+                |> filter(fn: (r) => r["_measurement"] == "W")\
+                |> filter(fn: (r) => r["_field"] == "value")\
+                |> filter(fn: (r) => r["domain"] == "sensor")\
+                |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
+                |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
+                |> yield(name: "Consumption")'
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
             elif value == 'tdata':
-                query = '''
-                from(bucket: "homeassistant")
-                        |> range(start: -365d, stop: now())
-                        |> filter(fn: (r) => r["_measurement"] == "°C")
-                        |> filter(fn: (r) => r["_field"] == "value")
-                        |> filter(fn: (r) => r["domain"] == "sensor")
-                        |> filter(fn: (r) => r["entity_id"] == "weatherxm_temperature_celsius")
-                        |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)
-                        |> yield(name: "temperature")
-                '''
-                return self.influxclient.query_api(query)
+                query = 'from(bucket: "homeassistant")\
+                |> range(start: -365d, stop: now())\
+                |> filter(fn: (r) => r["_measurement"] == "°C")\
+                |> filter(fn: (r) => r["_field"] == "value")\
+                |> filter(fn: (r) => r["domain"] == "sensor")\
+                |> filter(fn: (r) => r["entity_id"] == "weatherxm_temperature_celsius")\
+                |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
+                |> yield(name: "temperature")'
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
             elif value == 'consumption':
-                query = '''
-                from(bucket: "homeassistant")
-                        |> range(start: -2d, stop: now())
-                        |> filter(fn: (r) => r["_measurement"] == "W")
-                        |> filter(fn: (r) => r["_field"] == "value")
-                        |> filter(fn: (r) => r["domain"] == "sensor")
-                        |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")
-                        |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)
-                        |> yield(name: "Consumption")
-                '''
-                return self.influxclient.query_api(query)
+                query = 'from(bucket: "homeassistant")\
+                |> range(start: -2d, stop: now())\
+                |> filter(fn: (r) => r["_measurement"] == "W")\
+                |> filter(fn: (r) => r["_field"] == "value")\
+                |> filter(fn: (r) => r["domain"] == "sensor")\
+                |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
+                |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
+                |> yield(name: "Consumption")'
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
             elif value == 'PV':
-                query = '''
-                from(bucket: "homeassistant")
-                        |> range(start: -2d, stop: now())
-                        |> filter(fn: (r) => r["_measurement"] == "W")
-                        |> filter(fn: (r) => r["_field"] == "value")
-                        |> filter(fn: (r) => r["domain"] == "sensor")
-                        |> filter(fn: (r) => r["entity_id"] == "pv_ac_power")
-                        |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)
-                        |> yield(name: "PVreal")
-                '''
-                return self.influxclient.query_api(query)
+                query = 'from(bucket: "homeassistant")\
+                |> range(start: -2d, stop: now())\
+                |> filter(fn: (r) => r["_measurement"] == "W")\
+                |> filter(fn: (r) => r["_field"] == "value")\
+                |> filter(fn: (r) => r["domain"] == "sensor")\
+                |> filter(fn: (r) => r["entity_id"] == "pv_ac_power")\
+                |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
+                |> yield(name: "PVreal")'
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
             elif value == 'GRID':
-                query = '''
-                from(bucket: "homeassistant")
-                        |> range(start: -2d, stop: now())
-                        |> filter(fn: (r) => r["_measurement"] == "W")
-                        |> filter(fn: (r) => r["_field"] == "value")
-                        |> filter(fn: (r) => r["domain"] == "sensor")
-                        |> filter(fn: (r) => r["entity_id"] == "grid_total_power")
-                        |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)
-                        |> yield(name: "GRID")
-                '''
-                return self.influxclient.query_api(query)
+                query = 'from(bucket: "homeassistant")\
+                |> range(start: -2d, stop: now())\
+                |> filter(fn: (r) => r["_measurement"] == "W")\
+                |> filter(fn: (r) => r["_field"] == "value")\
+                |> filter(fn: (r) => r["domain"] == "sensor")\
+                |> filter(fn: (r) => r["entity_id"] == "grid_total_power")\
+                |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
+                |> yield(name: "GRID")'
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
             elif value == 'SOC':
-                query = '''
-                from(bucket: "homeassistant")
-                        |> range(start: -2d, stop: now())
-                        |> filter(fn: (r) => r["_measurement"] == "%")
-                        |> filter(fn: (r) => r["_field"] == "value")
-                        |> filter(fn: (r) => r["domain"] == "sensor")
-                        |> filter(fn: (r) => r["entity_id"] == "victron_battery_soc_223")
-                        |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)
-                        |> yield(name: "SOCact")
-                '''
-                return self.influxclient.query_api(query)
+                query = 'from(bucket: "homeassistant")\
+                |> range(start: -2d, stop: now())\
+                |> filter(fn: (r) => r["_measurement"] == "%")\
+                |> filter(fn: (r) => r["_field"] == "value")\
+                |> filter(fn: (r) => r["domain"] == "sensor")\
+                |> filter(fn: (r) => r["entity_id"] == "victron_battery_soc_223")\
+                |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
+                |> yield(name: "SOCact")'
+                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)

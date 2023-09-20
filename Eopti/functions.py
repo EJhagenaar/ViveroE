@@ -641,7 +641,7 @@ class Eoptimization:
                 result.set_index('_time', drop=True, inplace=True)
                 del result['result']
                 del result['table']
-                del result[_time]
+                result.tail(-1)
                 print(result)
                 return result
             elif value == 'tdata':

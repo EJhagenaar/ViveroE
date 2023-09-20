@@ -637,8 +637,8 @@ class Eoptimization:
                 |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
                 |> keep(columns: ["_time","value"])\
                 |> rename(columns: {value: "consumption"})'    
-                result = pd.self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
-                result.set_index('_time', drop=True)
+                result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
+                result.set_index('_time', drop=True, inplace=True))
                 del result['result']
                 del result['table']
                 print(result)

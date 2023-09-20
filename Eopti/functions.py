@@ -638,10 +638,8 @@ class Eoptimization:
                 |> keep(columns: ["_time","value"])\
                 |> rename(columns: {value: "consumption"})'    
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
-                #print(result)
-                result.set_index('_time')
-                del result['result']
-                del result['table']
+                result.set_index('_time', drop=True)
+                result.drop(['result','table'], axis=1)
                 print(result)
                 return result
             elif value == 'tdata':

@@ -639,7 +639,6 @@ class Eoptimization:
                 |> rename(columns: {value: "consumption"})'    
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
                 #print(result)
-                .set_index(['Datetime'])
                 result.set_index('_time')
                 del result['result']
                 del result['table']

@@ -640,7 +640,7 @@ class Eoptimization:
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
                 del result['result']
                 del result['table']
-                result['_time'] = pd.to_datetime(result['_time']) 
+                #result['_time'] = pd.to_datetime(result['_time']) 
                 result.set_index('_time', drop=True, inplace=True)
                 result.index.name = None 
                 print('========== edata ==========')

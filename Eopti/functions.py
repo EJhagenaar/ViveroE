@@ -643,6 +643,7 @@ class Eoptimization:
                 result['_time'] = pd.to_datetime(result['_time']) 
                 result.set_index('_time', drop=True, inplace=True)
                 result.index.name = None 
+                print('========== edata ==========')
                 print(result)
                 return result
             elif value == 'tdata':
@@ -662,6 +663,7 @@ class Eoptimization:
                 result['_time'] = pd.to_datetime(result['_time']) 
                 result.set_index('_time', drop=True, inplace=True)
                 result.index.name = None 
+                print('========== tdata ==========')
                 print(result)
                 return result
             
@@ -683,6 +685,7 @@ class Eoptimization:
                 result['_time'] = pd.to_datetime(result['_time']) 
                 result.set_index('_time', drop=True, inplace=True)
                 result.index.name = None 
+                print('========== consumption ==========')
                 print(result)
                 return result
             elif value == 'PV':
@@ -703,6 +706,7 @@ class Eoptimization:
                 result['_time'] = pd.to_datetime(result['_time']) 
                 result.set_index('_time', drop=True, inplace=True)
                 result.index.name = None 
+                print('========== PV ==========')
                 print(result)
                 return result
             elif value == 'GRID':
@@ -723,6 +727,7 @@ class Eoptimization:
                 result['_time'] = pd.to_datetime(result['_time']) 
                 result.set_index('_time', drop=True, inplace=True)
                 result.index.name = None 
+                print('========== GRID ==========')
                 print(result)
                 return result
             elif value == 'SOC':
@@ -742,5 +747,6 @@ class Eoptimization:
                 result['_time'] = pd.to_datetime(result['_time']) 
                 result.set_index('_time', drop=True, inplace=True)
                 result.index.name = None 
+                print('========== SOC ==========')
                 print(result)
                 return result

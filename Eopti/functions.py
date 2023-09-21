@@ -642,7 +642,7 @@ class Eoptimization:
                 del result['table']
                 result['_time'] = pd.to_datetime(result['_time']) 
                 result.set_index('_time', drop=True, inplace=True)
-                result.tail(-1)
+                result=result.droplevel(0, axis=0) 
                 print(result)
                 return result
             elif value == 'tdata':

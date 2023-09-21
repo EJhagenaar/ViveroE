@@ -653,6 +653,7 @@ class Eoptimization:
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "weatherxm_temperature_celsius")\
                 |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
+                |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "temperature"})'
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
@@ -673,6 +674,7 @@ class Eoptimization:
                 |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
                 |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
+                |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "Consumption"})'
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
@@ -692,6 +694,7 @@ class Eoptimization:
                 |> filter(fn: (r) => r["entity_id"] == "pv_ac_power")\
                 |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
+                |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "PVreal"})'
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
@@ -711,6 +714,7 @@ class Eoptimization:
                 |> filter(fn: (r) => r["entity_id"] == "grid_total_power")\
                 |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
+                |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "GRID"})'
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
@@ -729,6 +733,7 @@ class Eoptimization:
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "victron_battery_soc_223")\
                 |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
+                |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "SOCact"})'
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)

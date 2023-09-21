@@ -45,27 +45,27 @@ def calculate():
     except Exception as error:
         return {"status": "Error trying to get future external variables"}, error  
 
- #   try:
- #       Eopti.forecastEdata(backtest=0,plot=0)
- #   except:
- #       return {"status": "Error trying to create forecast data for energy"} 
+    try:
+        Eopti.forecastEdata(backtest=0,plot=0)
+    except Exception as error:
+        return {"status": "Error trying to create forecast data for energy"}, error 
     
- #   try:
- #       Eopti.createOptInput()
- #   except:
- #       return {"status": "Error trying to greate dataframe from previous input"} 
+    try:
+        Eopti.createOptInput()
+    except Exception as error:
+        return {"status": "Error trying to greate dataframe from previous input"}, error 
 
- #   try:
- #       Eopti.priceForecast()
- #   except:
- #       return {"status": "Error trying to get price forecast >24h ahead from "} 
+    try:
+        Eopti.priceForecast()
+    except Exception as error:
+        return {"status": "Error trying to get price forecast >24h ahead from "}, error 
     
-  #  try:
-  #      Eopti.createOptimization(smartSOC=1)
-  #  except:
-  #      return {"status": "Error trying to greate dataframe from previous input"}     
-    
- #   return Response(Eopti.Optimization.to_json(orient="index"), media_type="application/json")
+    try:
+        Eopti.createOptimization(smartSOC=1)
+    except Exception as error:
+        return {"status": "Error trying to greate dataframe from previous input"}, error     
+   
+    return Response(Eopti.Optimization.to_json(orient="index"), media_type="application/json")
 
 @app.get("/plot/{number}")
 def plot(number):

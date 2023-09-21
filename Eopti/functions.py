@@ -653,18 +653,16 @@ class Eoptimization:
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "weatherxm_temperature_celsius")\
                 |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)'
-#                |> keep(columns: ["_time", "_value"])\
-#                |> rename(columns: {_time: "time", _value: "temperature"})'
-                result = self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)
-#                results = []
-#                for table in result:
-#                  for record in table.records:
-#                    results.append((record.get_time(), record.get_value()))
-#                print(result)
-                return results
-                _data_frame = pd.DataFrame(data=[["coyote_creek", 1.0], ["coyote_creek", 2.0]],
-                           index=[_now, _now + timedelta(hours=1)],
-                           columns=["location", "water_level"])
+                |> keep(columns: ["_time", "_value"])\
+                |> rename(columns: {_time: "time", _value: "temperature"})'
+                result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
+                del result['result']
+                del result['table']
+                result['_time'] = pd.to_datetime(result['_time']) 
+                result.set_index('_time', drop=True, inplace=True)
+                result.index.name = None 
+                print(result)
+                return result
             
             elif value == 'consumption':
                 query = 'from(bucket: "homeassistant")\
@@ -677,7 +675,14 @@ class Eoptimization:
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "Consumption"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['W']
+                result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
+                del result['result']
+                del result['table']
+                result['_time'] = pd.to_datetime(result['_time']) 
+                result.set_index('_time', drop=True, inplace=True)
+                result.index.name = None 
+                print(result)
+                return result
             elif value == 'PV':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -2d, stop: now())\
@@ -689,7 +694,14 @@ class Eoptimization:
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "PVreal"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['W']
+                result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
+                del result['result']
+                del result['table']
+                result['_time'] = pd.to_datetime(result['_time']) 
+                result.set_index('_time', drop=True, inplace=True)
+                result.index.name = None 
+                print(result)
+                return result
             elif value == 'GRID':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -2d, stop: now())\
@@ -701,7 +713,14 @@ class Eoptimization:
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "GRID"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['W']
+                result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
+                del result['result']
+                del result['table']
+                result['_time'] = pd.to_datetime(result['_time']) 
+                result.set_index('_time', drop=True, inplace=True)
+                result.index.name = None 
+                print(result)
+                return result
             elif value == 'SOC':
                 query = 'from(bucket: "homeassistant")\
                 |> range(start: -2d, stop: now())\
@@ -712,4 +731,11 @@ class Eoptimization:
                 |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "SOCact"})'
-                return self.query_api.query(org=self.influxconfig['influxdb_organization'], query=query)['%']
+                result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
+                del result['result']
+                del result['table']
+                result['_time'] = pd.to_datetime(result['_time']) 
+                result.set_index('_time', drop=True, inplace=True)
+                result.index.name = None 
+                print(result)
+                return result

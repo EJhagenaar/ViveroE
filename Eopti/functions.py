@@ -652,7 +652,7 @@ class Eoptimization:
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
                 |> filter(fn: (r) => r["entity_id"] == "weatherxm_temperature_celsius")\
-                |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)'
+                |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
                 |> keep(columns: ["_time", "_value"])\
                 |> rename(columns: {_time: "time", _value: "temperature"})'
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)

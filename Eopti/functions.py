@@ -638,8 +638,6 @@ class Eoptimization:
                 |> keep(columns: ["_time","value"])\
                 |> rename(columns: {value: "consumption"})'    
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
-                print('========== edata ==========')
-                print(result)
                 del result['result']
                 del result['table']
                 result['_time'] = pd.to_datetime(result['_time']) 
@@ -660,8 +658,6 @@ class Eoptimization:
                 |> keep(columns: ["_time", "value"])\
                 |> rename(columns: {value: "temperature"})'
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
-                print('========== tdata ==========')
-                print(result)
                 del result['result']
                 del result['table']
                 result['_time'] = pd.to_datetime(result['_time']) 
@@ -684,8 +680,6 @@ class Eoptimization:
                 |> keep(columns: ["_time", "value"])\
                 |> rename(columns: {_time: "time", value: "Consumption"})'
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
-                print('========== consumption ==========')
-                print(result)
                 del result['result']
                 del result['table']
                 result['_time'] = pd.to_datetime(result['_time']) 
@@ -707,8 +701,6 @@ class Eoptimization:
                 |> keep(columns: ["_time", "value"])\
                 |> rename(columns: {_time: "time", value: "PVreal"})'
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
-                print('========== PV ==========')
-                print(result)
                 del result['result']
                 del result['table']
                 result['_time'] = pd.to_datetime(result['_time']) 
@@ -730,8 +722,6 @@ class Eoptimization:
                 |> keep(columns: ["_time", "value"])\
                 |> rename(columns: {_time: "time", value: "GRID"})'
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
-                print('========== GRID ==========')
-                print(result)
                 del result['result']
                 del result['table']
                 result['_time'] = pd.to_datetime(result['_time']) 

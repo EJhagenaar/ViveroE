@@ -657,8 +657,8 @@ class Eoptimization:
                 |> filter(fn: (r) => r["entity_id"] == "weatherxm_temperature_celsius")\
                 |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
                 |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
-                |> keep(columns: ["_time", "temperature"])\
-                |> rename(columns: {_time: "time"})'
+                |> keep(columns: ["_time", "value"])\
+                |> rename(columns: {value: "temperature"})'
                 result = self.query_api.query_data_frame(org=self.influxconfig['influxdb_organization'], query=query)
                 print('========== tdata ==========')
                 print(result)

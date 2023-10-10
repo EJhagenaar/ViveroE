@@ -38,9 +38,9 @@ RUN pip install uvicorn --break-system-packages
 WORKDIR /root/build
 RUN wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew
 RUN chmod a+x ./coinbrew
-RUN ./coinbrew fetch Cbc --no-prompt
+RUN ./coinbrew fetch Cbc@master --no-prompt
 RUN mkdir -p /root/build/miplib
-RUN ./coinbrew build Cbc --no-prompt --prefix=/root/build/miplib/ --tests=none --enable-cbc-parallel --enable-relocatable
+RUN ./coinbrew build Cbc@master --no-prompt --prefix=/root/build/miplib/ --tests=none --enable-cbc-parallel --enable-relocatable
 RUN cd /root/build/miplib/lib && ln -s libCbc.so.0.0.0 libCbcSolver.so
 RUN export PMIP_CBC_LIBRARY="/root/build/miplib/lib/libCbcSolver.so"
 RUN export LD_LIBRARY_PATH="/root/build/miplib/lib/"

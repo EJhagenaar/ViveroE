@@ -32,6 +32,7 @@ RUN pip install requests --break-system-packages
 RUN pip install scikit_learn --break-system-packages
 RUN pip install seaborn --break-system-packages
 RUN pip install skforecast --break-system-packages
+RUN pip install starlette --break-system-packages
 RUN pip install statsmodels --break-system-packages
 RUN pip install uvicorn --break-system-packages
 

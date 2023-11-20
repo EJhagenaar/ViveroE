@@ -46,7 +46,7 @@ class Eoptimization:
         if self.influxconfig['influxdb_version'] == 1:
             self.influxclient = DataFrameClient(host=self.influxconfig['influxdb_ip'], port=self.influxconfig['influxdb_port'], username=self.influxconfig['influxdb_username'], password=self.influxconfig['influxdb_password'], database=self.influxconfig['influxdb_database'])
         else:
-            self.influxclient = InfluxDBClient(url='http://' + self.influxconfig['influxdb_ip'] + ':' + self.influxconfig['influxdb_port'], token=self.influxconfig['influxdb_token'], org=self.influxconfig['influxdb_organization'])
+            self.influxclient = InfluxDBClient(url=self.influxconfig['influxdb_ip']+self.influxconfig['influxdb_port'], token=self.influxconfig['influxdb_token'], org=self.influxconfig['organization'])
             self.query_api = self.influxclient.query_api()
         self.dayondayprice = 0.0
         self.calculatedat = datetime.now()
@@ -102,12 +102,16 @@ class Eoptimization:
         lat=self.config['TempForecast']['lat']
         lon=self.config['TempForecast']['lon']
         appid=self.config['TempForecast']['appid']
-        response=requests.get(f'https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&exclude=current,minutely,daily,alerts&appid={appid}').json()
-        for row in response['hourly']:
-            self.TempForecast = pd.concat([self.TempForecast, pd.DataFrame({'time': datetime.fromtimestamp(row['dt']), 'temperature': row['temp']-272.15}, index=[0])], ignore_index=True)
-
+        response=requests.get(f'https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&exclude=current,minutely,hourly,alerts&appid={appid}').json()
+        for row in response['daily']:
+            self.TempForecast = pd.concat([self.TempForecast, pd.DataFrame({'time': datetime.fromtimestamp(row['dt']), 'temperature': row['temp']['max']-272.15}, index=[0])], ignore_index=True)
         self.TempForecast=self.TempForecast.set_index('time')
-        self.TempForecast.index = self.TempForecast.index.tz_localize(self.influxconfig['timezone'])
+        self.TempForecast.index=self.TempForecast.index.normalize()
+        self.TempForecast=self.TempForecast.asfreq('H', method='ffill').sort_index()
+        try:
+            self.TempForecast.index = self.TempForecast.index.tz_localize(self.influxconfig['timezone'], ambiguous='infer')
+        except:
+            self.TempForecast.index = self.TempForecast.index.tz_localize(self.influxconfig['timezone'], ambiguous=True)
 
 
 
@@ -123,9 +127,12 @@ class Eoptimization:
         #get temperature data
         tdata=self.getfromInflux('tdata')
         tdata.index = tdata.index.tz_convert(self.influxconfig['timezone'])
-        tdata = tdata.asfreq('H', fill_value=15.0).sort_index()
-        self.edata = self.edata.join(tdata, how='left')
+        tdata.index.name='time'
+        tdata.index = tdata.index.normalize()
+        tdata = tdata.asfreq('H', method='ffill').sort_index()
+        self.edata = self.edata.join(tdata, how='left')        
         self.edata['temperature']=self.edata['temperature'].fillna(0.0)
+        self.edata['temperature']=self.edata['temperature'].round(2)
         #add holiday data
         self.edata['holiday']=0
         for row in self.config['Holiday']:
@@ -163,14 +170,18 @@ class Eoptimization:
         self.ExogFut=pd.DataFrame(pd.date_range((datetime.today().replace(minute=0, second=0, microsecond=0)).strftime("%Y/%m/%d, %H:%M:%S"),(datetime.today().replace(minute=0, second=0, microsecond=0)+timedelta(hours=34)).strftime("%Y/%m/%d, %H:%M:%S"),freq='H'),columns=['time'])
         self.ExogFut['time']=pd.to_datetime(self.ExogFut['time'])
         self.ExogFut=self.ExogFut.set_index('time')
-        self.ExogFut = self.ExogFut.tz_localize(self.influxconfig['timezone'])
+        try:
+            self.ExogFut = self.ExogFut.tz_localize(self.influxconfig['timezone'], ambiguous=True)
+        except:
+            self.ExogFut = self.ExogFut.tz_localize(self.influxconfig['timezone'])
         self.ExogFut = self.ExogFut.asfreq('H', fill_value=0.0).sort_index()
         self.ExogFut['weekday'] = self.ExogFut.index.weekday
         self.ExogFut['hour'] = self.ExogFut.index.hour
-        self.ExogFut['holiday']=0   
+ 
         #add for temperature if needed 
         if temp==1:
             self.ExogFut = self.ExogFut.join(self.TempForecast, how='left')
+        self.ExogFut['holiday']=0  
 
     #forecast energy consumption
     def forecastEdata(self,backtest=0,plot=0):
@@ -182,7 +193,7 @@ class Eoptimization:
                         lags          = [1, 2, 3, 23, 24, 25, 47, 48, 49],
                         transformer_y = StandardScaler()
                     )
-        exog = [col for col in self.edata.columns if col.startswith(('weekday', 'hour','holiday'))] #add temperature if needed
+        exog = [col for col in self.edata.columns if col.startswith(('weekday', 'hour','temperature','holiday'))] #add temperature if needed
         end_forecast=(datetime.today().replace(minute=0, second=0, microsecond=0)+timedelta(hours=-1)).strftime("%Y/%m/%d, %H:%M:%S")
         forecaster.fit(y=self.edata.loc[begin_data:end_data, 'consumption'], exog=self.edata.loc[begin_data:end_data, exog])
         self.Eforecast=forecaster.predict(35,self.edata.loc[:end_forecast, 'consumption'],exog=self.ExogFut)
@@ -219,7 +230,10 @@ class Eoptimization:
         self.Optimization=pd.DataFrame(pd.date_range((datetime.today().replace(hour=curhour,minute=0, second=0, microsecond=0)).strftime("%Y/%m/%d, %H:%M:%S"),(datetime.today().replace(hour=curhour,minute=0, second=0, microsecond=0)+timedelta(hours=horizon)).strftime("%Y/%m/%d, %H:%M:%S"),freq='H'),columns=['time'])
         self.Optimization['time']=pd.to_datetime(self.Optimization['time'])
         self.Optimization=self.Optimization.set_index('time')
-        self.Optimization = self.Optimization.tz_localize(self.influxconfig['timezone'])
+        try:
+            self.Optimization = self.Optimization.tz_localize(self.influxconfig['timezone'], ambiguous='infer')
+        except:
+            self.Optimization = self.Optimization.tz_localize(self.influxconfig['timezone'], ambiguous=True)
         self.Optimization = self.Optimization.asfreq('H', fill_value=0.0).sort_index()
         self.Optimization=self.Optimization.join(self.Eforecast, how='left')
         self.Optimization=self.Optimization.rename(columns={'pred': 'Eforecast'})
@@ -316,6 +330,15 @@ class Eoptimization:
             m += z[i]-(self.config['Battery']['maxdischarge']*(1-e[i])) <= 0
             m += SOC + xsum(w[j]*eta for j in range(i) ) - xsum(z[j]/eta for j in range(i+1)) <= maxSOC
             m += SOC + xsum(w[j]*eta for j in range(i) ) - xsum(z[j]/eta for j in range(i+1)) >= minSOC
+        
+        #prevent feed back to GRID from battery if not allowed
+        if self.config['Optimization']['FeedbackBatt'] == 0:
+            for i in n:
+                if PV[i] > PL[i]:
+                    m += y[i] - (PV[i]-PL[i]) <= 0
+                else:
+                    m += y[i] == 0
+        
 
         if fixSOCt>0 and SOCtarget>0.0:
             m += SOC + xsum(w[i]*eta for i in range(fixSOCt+1) ) - xsum(z[i]/eta for i in range(fixSOCt+1)) <= SOCtarget*BattCapacity + 0.025*BattCapacity
@@ -341,6 +364,7 @@ class Eoptimization:
             #find max amount to be taken from GRID if settings don't allow unlmited GRID use
             if self.config['Optimization']['GRIDSlack']!=100.0:
                 SOCsim=SOC
+                SOCstart=SOC
                 DifFromMinSOC=SOC-minSOC
                 GRIDallowance=0.0
                 
@@ -359,7 +383,7 @@ class Eoptimization:
                         SOCsim=SOCsim+BATin-BATout
                     DifFromMinSOC=SOCsim-minSOC
                     if DifFromMinSOC<0.0 and DifFromMinSOC<prevDifFromMinSOC:
-                        GRIDallowance+=(prevDifFromMinSOC-DifFromMinSOC)*-1.0
+                        GRIDallowance+=(prevDifFromMinSOC-DifFromMinSOC)
                 GRIDallowance=GRIDallowance+((endSOC-SOCsim) if SOCsim<endSOC else 0.0)
                 m += xsum(x[i] for i in n) <= (1.0+self.config['Optimization']['GRIDSlack'])*(GRIDallowance/eta)          
 

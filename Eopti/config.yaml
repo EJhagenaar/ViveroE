@@ -81,7 +81,7 @@ options:
     outside_temperature_sensor: 'openweathermap_temperature'
     timezone: 'Europe/Amsterdam'
     influxdb_ip: '192.168.2.101'
-    influxdb_port: 8086
+    influxdb_port: '8086'
     influxdb_username: 'username'
     influxdb_password: 'password'
     influxdb_database: 'homeassistant'
@@ -197,7 +197,7 @@ schema:
     outside_temperature_sensor: str
     timezone: str
     influxdb_ip: str
-    influxdb_port: int
+    influxdb_port: str
     influxdb_username: str
     influxdb_password: str
     influxdb_database: str

@@ -36,17 +36,20 @@ def calculate():
 
     try:
         Eopti.loadEdata()
+        print('excecuted Eopti.loadEdata()')
     except Exception as error:
         # handle the exception
         return {"status": "Error trying to load historical energy data from HA sensor and influxDB"}, error     
     
     try:
         Eopti.getExogFut()
+        print('excecuted getExogFut()')
     except Exception as error:
         return {"status": "Error trying to get future external variables"}, error  
 
     try:
         Eopti.forecastEdata(backtest=0,plot=0)
+         print('excecuted Eopti.forecastEdata(backtest=0,plot=0)')
     except Exception as error:
         return {"status": "Error trying to create forecast data for energy"}, error 
     

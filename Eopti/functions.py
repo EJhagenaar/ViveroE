@@ -119,6 +119,7 @@ class Eoptimization:
     def loadEdata(self):
         #get consumption
         self.edata=self.getfromInflux('edata')
+        print(self.edata)
         self.edata.index.name='time'
         self.edata.index = self.edata.index.tz_convert(self.influxconfig['timezone'])
         self.edata = self.edata.asfreq('H', fill_value=0.0).sort_index()
@@ -126,11 +127,19 @@ class Eoptimization:
         self.edata['hour'] = self.edata.index.hour
         #get temperature data
         tdata=self.getfromInflux('tdata')
+        print('tdata1')
+        print(tdata)
         tdata.index = tdata.index.tz_convert(self.influxconfig['timezone'])
         tdata.index.name='time'
         tdata.index = tdata.index.normalize()
+        print('tdata2')
+        print(tdata)
         tdata = tdata.asfreq('H', method='ffill').sort_index()
-        self.edata = self.edata.join(tdata, how='left')        
+        print('tdata3')
+        print(tdata)
+        self.edata = self.edata.join(tdata, how='left')
+        print('tdata4')
+        print(tdata)
         self.edata['temperature']=self.edata['temperature'].fillna(0.0)
         self.edata['temperature']=self.edata['temperature'].round(2)
         #add holiday data

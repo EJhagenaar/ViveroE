@@ -128,24 +128,25 @@ class Eoptimization:
         #get temperature data
         tdata=self.getfromInflux('tdata')
         print('tdata1')
-        print(tdata)
+        #print(tdata)
         tdata.index = tdata.index.tz_convert(self.influxconfig['timezone'])
         tdata.index.name='time'
         tdata.index = tdata.index.normalize()
         print('tdata2')
-        print(tdata)
+        #print(tdata)
         tdata = tdata.asfreq('H', method='ffill').sort_index()
         print('tdata3')
-        print(tdata)
+        #print(tdata)
         self.edata = self.edata.join(tdata, how='left')
         print('tdata4')
-        print(tdata)
+        #print(tdata)
         self.edata['temperature']=self.edata['temperature'].fillna(0.0)
         self.edata['temperature']=self.edata['temperature'].round(2)
+        print('tdata5'
         #add holiday data
         self.edata['holiday']=0
-        #for row in self.config['Holiday']:
-        #    self.edata.loc[row['start']:row['end'],"holiday"]=1
+        for row in self.config['Holiday']:
+            self.edata.loc[row['start']:row['end'],"holiday"]=1
 
     #plot edata if necessary
     def plotEdata(self):

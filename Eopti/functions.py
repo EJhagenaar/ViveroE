@@ -135,8 +135,8 @@ class Eoptimization:
         self.edata['temperature']=self.edata['temperature'].round(2)
         #add holiday data
         self.edata['holiday']=0
-        for row in self.config['Holiday']:
-            self.edata.loc[row['start']:row['end'],"holiday"]=1
+        #for row in self.config['Holiday']:
+        #    self.edata.loc[row['start']:row['end'],"holiday"]=1
 
     #plot edata if necessary
     def plotEdata(self):

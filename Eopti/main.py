@@ -49,7 +49,7 @@ def calculate():
 
     try:
         Eopti.forecastEdata(backtest=0,plot=0)
-         print('excecuted Eopti.forecastEdata(backtest=0,plot=0)')
+        print('excecuted Eopti.forecastEdata(backtest=0,plot=0)')
     except Exception as error:
         return {"status": "Error trying to create forecast data for energy"}, error 
     

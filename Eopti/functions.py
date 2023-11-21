@@ -142,7 +142,7 @@ class Eoptimization:
         #print(tdata)
         self.edata['temperature']=self.edata['temperature'].fillna(0.0)
         self.edata['temperature']=self.edata['temperature'].round(2)
-        print('tdata5'
+        print('tdata5')
         #add holiday data
         self.edata['holiday']=0
         for row in self.config['Holiday']:

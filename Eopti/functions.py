@@ -130,6 +130,7 @@ class Eoptimization:
         print('tdata')
         self.tdata=self.getfromInflux('tdata')
         print('tdata1')
+        print(self.tdata)
         self.tdata.index = self.tdata.index.tz_convert(self.influxconfig['timezone'])
         self.tdata.index.name='time'
         self.tdata.index = self.tdata.index.normalize()

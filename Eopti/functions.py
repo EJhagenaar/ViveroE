@@ -107,6 +107,7 @@ class Eoptimization:
             self.TempForecast = pd.concat([self.TempForecast, pd.DataFrame({'time': datetime.fromtimestamp(row['dt']), 'temperature': row['temp']['max']-272.15}, index=[0])], ignore_index=True)
         self.TempForecast=self.TempForecast.set_index('time')
         self.TempForecast.index=self.TempForecast.index.normalize()
+        print(self.TempForecast)
         self.TempForecast=self.TempForecast.asfreq('H', method='ffill').sort_index()
         try:
             self.TempForecast.index = self.TempForecast.index.tz_localize(self.influxconfig['timezone'], ambiguous='infer')

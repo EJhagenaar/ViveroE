@@ -134,7 +134,7 @@ class Eoptimization:
         tdata.index = tdata.index.normalize()
         print('tdata2')
         print(tdata)
-        #tdata = tdata.asfreq('H', method='ffill').sort_index()
+        tdata = tdata.asfreq('H', method='ffill').sort_index()
         print('tdata3')
         #print(tdata)
         self.edata = self.edata.join(tdata, how='left')

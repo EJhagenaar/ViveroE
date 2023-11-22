@@ -120,12 +120,12 @@ class Eoptimization:
     def loadEdata(self):
         #get consumption
         self.edata=self.getfromInflux('edata')
-        print(self.edata)
         self.edata.index.name='time'
         self.edata.index = self.edata.index.tz_convert(self.influxconfig['timezone'])
         self.edata = self.edata.asfreq('H', fill_value=0.0).sort_index()
         self.edata['weekday'] = self.edata.index.weekday
         self.edata['hour'] = self.edata.index.hour
+        print(self.edata)
         #get temperature data
         print('tdata')
         self.tdata=self.getfromInflux('tdata')

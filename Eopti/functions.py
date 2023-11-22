@@ -127,6 +127,7 @@ class Eoptimization:
         self.edata['weekday'] = self.edata.index.weekday
         self.edata['hour'] = self.edata.index.hour
         #get temperature data
+        print('tdata')
         tdata=self.getfromInflux('tdata')
         print('tdata1')
         tdata.index = tdata.index.tz_convert(self.influxconfig['timezone'])

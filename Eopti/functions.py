@@ -120,7 +120,7 @@ class Eoptimization:
     def loadEdata(self):
         #get consumption
         self.edata=self.getfromInflux('edata')
-        #print(self.edata)
+        print(self.edata)
         self.edata.index.name='time'
         self.edata.index = self.edata.index.tz_convert(self.influxconfig['timezone'])
         self.edata = self.edata.asfreq('H', fill_value=0.0).sort_index()
@@ -128,17 +128,17 @@ class Eoptimization:
         self.edata['hour'] = self.edata.index.hour
         #get temperature data
         print('tdata')
-        tdata=self.getfromInflux('tdata')
+        self.tdata=self.getfromInflux('tdata')
         print('tdata1')
-        tdata.index = tdata.index.tz_convert(self.influxconfig['timezone'])
-        tdata.index.name='time'
-        tdata.index = tdata.index.normalize()
+        self.tdata.index = self.tdata.index.tz_convert(self.influxconfig['timezone'])
+        self.tdata.index.name='time'
+        self.tdata.index = self.tdata.index.normalize()
         print('tdata2')
-        print(tdata)
-        tdata = tdata.asfreq('H', method='ffill').sort_index()
+        print(self.tdata)
+        self.tdata = self.tdata.asfreq('H', method='ffill').sort_index()
         print('tdata3')
         #print(tdata)
-        self.edata = self.edata.join(tdata, how='left')
+        self.edata = self.edata.join(self.tdata, how='left')
         print('tdata4')
         #print(tdata)
         self.edata['temperature']=self.edata['temperature'].fillna(0.0)

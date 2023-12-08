@@ -46,7 +46,7 @@ class Eoptimization:
         if self.influxconfig['influxdb_version'] == 1:
             self.influxclient = DataFrameClient(host=self.influxconfig['influxdb_ip'], port=self.influxconfig['influxdb_port'], username=self.influxconfig['influxdb_username'], password=self.influxconfig['influxdb_password'], database=self.influxconfig['influxdb_database'])
         else:
-            self.influxclient = InfluxDBClient(url='http://' + self.influxconfig['influxdb_ip'] + ':' + self.influxconfig['influxdb_port'], token=self.influxconfig['influxdb_token'], org=self.influxconfig['influxdb_organization'])
+            self.influxclient = InfluxDBClient(url=self.influxconfig['influxdb_ip']+self.influxconfig['influxdb_port'], token=self.influxconfig['influxdb_token'], org=self.influxconfig['organization'])
             self.query_api = self.influxclient.query_api()
         self.dayondayprice = 0.0
         self.calculatedat = datetime.now()
@@ -107,7 +107,6 @@ class Eoptimization:
             self.TempForecast = pd.concat([self.TempForecast, pd.DataFrame({'time': datetime.fromtimestamp(row['dt']), 'temperature': row['temp']['max']-272.15}, index=[0])], ignore_index=True)
         self.TempForecast=self.TempForecast.set_index('time')
         self.TempForecast.index=self.TempForecast.index.normalize()
-        print(self.TempForecast)
         self.TempForecast=self.TempForecast.asfreq('H', method='ffill').sort_index()
         try:
             self.TempForecast.index = self.TempForecast.index.tz_localize(self.influxconfig['timezone'], ambiguous='infer')
@@ -130,12 +129,12 @@ class Eoptimization:
         print('tdata')
         tdata=self.getfromInflux('tdata')
         print('tdata1')
-        print(tdata)
+        #print(tdata)
         tdata.index = tdata.index.tz_convert(self.influxconfig['timezone'])
         tdata.index.name='time'
         tdata.index = tdata.index.normalize()
         print('tdata2')
-        print(tdata)
+        #print(tdata)
         tdata = tdata.asfreq('H', method='ffill').sort_index()
         print('tdata3')
         #print(tdata)

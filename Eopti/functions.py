@@ -128,18 +128,18 @@ class Eoptimization:
         print(self.edata)
         #get temperature data
         print('tdata')
-        self.tdata=self.getfromInflux('tdata')
+        tdata=self.getfromInflux('tdata')
         print('tdata1')
-        print(self.tdata)
-        self.tdata.index = self.tdata.index.tz_convert(self.influxconfig['timezone'])
-        self.tdata.index.name='time'
-        self.tdata.index = self.tdata.index.normalize()
+        print(tdata)
+        tdata.index = tdata.index.tz_convert(self.influxconfig['timezone'])
+        tdata.index.name='time'
+        tdata.index = tdata.index.normalize()
         print('tdata2')
-        print(self.tdata)
-        self.tdata = self.tdata.asfreq('H', method='ffill').sort_index()
+        print(tdata)
+        tdata = tdata.asfreq('H', method='ffill').sort_index()
         print('tdata3')
         #print(tdata)
-        self.edata = self.edata.join(self.tdata, how='left')
+        self.edata = self.edata.join(tdata, how='left')        
         print('tdata4')
         #print(tdata)
         self.edata['temperature']=self.edata['temperature'].fillna(0.0)
@@ -275,17 +275,20 @@ class Eoptimization:
         count1=0
         count2=0
         result = requests.get('https://energie.theoxygent.nl/api/prices.php').json()
-        for row in result[1]:
-            rowdate=datetime.fromtimestamp(row['x']*100).date() 
-            if rowdate == datetime.today().date()+timedelta(days=1):
-                tomorrow+=row['y']
-                count1+=1
-            if rowdate == datetime.today().date()+timedelta(days=2):
-                dayaftertomorrow+=row['y']
-                count2+=1
-        ptom=tomorrow/count1
-        pdat=dayaftertomorrow/count2
-        self.dayondayprice=pdat/ptom
+        try:                
+            for row in result[1]:
+                rowdate=datetime.fromtimestamp(row['x']*100).date() 
+                if rowdate == datetime.today().date()+timedelta(days=1):
+                    tomorrow+=row['y']
+                    count1+=1
+                if rowdate == datetime.today().date()+timedelta(days=2):
+                    dayaftertomorrow+=row['y']
+                    count2+=1
+            ptom=tomorrow/count1
+            pdat=dayaftertomorrow/count2
+            self.dayondayprice=pdat/ptom
+        except:
+            self.dayondayprice=0.9
         
     #fixSOC makes sure SOC stays relatively similar over a run (influence by SOCslack in conf), fixSOCt and SOCtarget assume SOC needs to be at a certain target. smartSOC uses forecast for prices to determine high or low SOC at the end of run    
     def createOptimization(self,fixSOC=0,fixSOCt=0, SOCtarget=0.0,smartSOC=0):
@@ -648,9 +651,9 @@ class Eoptimization:
     def getfromInflux(self,value):
         if self.influxconfig['influxdb_version'] == 1:
             if value == 'edata':
-                return self.influxclient.query('SELECT integral("value",1h)/ 1000 as consumption, time as time from "W" WHERE "entity_id"=\''+self.influxconfig['energy_demand_sensor']+'\' and time <= now() and time >= now() - 365d GROUP BY time(1h)')['W']
+                return self.influxclient.query('SELECT integral("value",1h)/ 1000 as consumption, time as time from "W" WHERE "entity_id"=\''+self.influxconfig['energy_demand_sensor']+'\' and time <= now() and time >= now() - 61d GROUP BY time(1h)')['W']
             elif value == 'tdata':
-                return self.influxclient.query('SELECT mean("value") as temperature, time as time from "°C" WHERE "entity_id"=\''+self.influxconfig['outside_temperature_sensor']+'\' and time <= now() and time >= now() - 365d GROUP BY time(1h)')['°C']
+                return self.influxclient.query('SELECT max("value") as temperature, time as time from "°C" WHERE "entity_id"=\''+self.influxconfig['outside_temperature_sensor']+'\' and time <= now() and time >= now() - 61d GROUP BY time(1d)')['°C']
             elif value == 'consumption':
                 return self.influxclient.query('SELECT integral("value",1h)/ 1000 as Consumption, time as time from "W" WHERE "entity_id"=\''+self.config['Sensors']['Consumption']+'\' and time <= now() and time >= now() - 2d GROUP BY time(1h)')['W']
             elif value == 'PV':
@@ -661,12 +664,12 @@ class Eoptimization:
                 return self.influxclient.query('SELECT mean("value") as SOCact, time as time from "%" WHERE "entity_id"=\''+self.config['Sensors']['SOC']+'\' and time <= now() and time >= now() - 2d GROUP BY time(1h)')['%']
         if self.influxconfig['influxdb_version'] == 2:
             if value == 'edata':
-                query = 'from(bucket: "homeassistant")\
+                query = 'from(bucket: "'+self.influxconfig['influxdb_database']+'")\
                 |> range(start: -365d, stop: now())\
                 |> filter(fn: (r) => r["_measurement"] == "W")\
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
-                |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
+                |> filter(fn: (r) => r["entity_id"] == "'+self.influxconfig['energy_demand_sensor']+'")\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
@@ -682,12 +685,12 @@ class Eoptimization:
                 print(result)
                 return result
             elif value == 'tdata':
-                query = 'from(bucket: "homeassistant")\
+                query = 'from(bucket: "'+self.influxconfig['influxdb_database']+'")\
                 |> range(start: -365d, stop: now())\
                 |> filter(fn: (r) => r["_measurement"] == "°C")\
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
-                |> filter(fn: (r) => r["entity_id"] == "weatherxm_temperature_celsius")\
+                |> filter(fn: (r) => r["entity_id"] == "'+self.influxconfig['outside_temperature_sensor']+'")\
                 |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\
                 |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
                 |> keep(columns: ["_time", "value"])\
@@ -703,12 +706,12 @@ class Eoptimization:
                 return result
             
             elif value == 'consumption':
-                query = 'from(bucket: "homeassistant")\
+                query = 'from(bucket: "'+self.influxconfig['influxdb_database']+'")\
                 |> range(start: -2d, stop: now())\
                 |> filter(fn: (r) => r["_measurement"] == "W")\
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
-                |> filter(fn: (r) => r["entity_id"] == "inverter_output_total")\
+                |> filter(fn: (r) => r["entity_id"] == "'+self.config['Sensors']['Consumption']+'")\
                 |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
@@ -724,12 +727,12 @@ class Eoptimization:
                 print(result)
                 return result
             elif value == 'PV':
-                query = 'from(bucket: "homeassistant")\
+                query = 'from(bucket: "'+self.influxconfig['influxdb_database']+'")\
                 |> range(start: -2d, stop: now())\
                 |> filter(fn: (r) => r["_measurement"] == "W")\
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
-                |> filter(fn: (r) => r["entity_id"] == "pv_ac_power")\
+                |> filter(fn: (r) => r["entity_id"] == "'+self.config['Sensors']['PV']+'")\
                 |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
@@ -745,12 +748,12 @@ class Eoptimization:
                 print(result)
                 return result
             elif value == 'GRID':
-                query = 'from(bucket: "homeassistant")\
+                query = 'from(bucket: "'+self.influxconfig['influxdb_database']+'")\
                 |> range(start: -2d, stop: now())\
                 |> filter(fn: (r) => r["_measurement"] == "W")\
                 |> filter(fn: (r) => r["_field"] == "value")\
                 |> filter(fn: (r) => r["domain"] == "sensor")\
-                |> filter(fn: (r) => r["entity_id"] == "grid_total_power")\
+                |> filter(fn: (r) => r["entity_id"] == "'+self.config['Sensors']['GRID']+'")\
                 |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\
                 |> aggregateWindow(every: 1h, fn: integral, createEmpty: false)\
                 |> pivot(rowKey:["_time"],columnKey: ["_field"],valueColumn: "_value")\
@@ -766,7 +769,7 @@ class Eoptimization:
                 print(result)
                 return result
             elif value == 'SOC':
-                query = 'from(bucket: "homeassistant")\
+                query = 'from(bucket: "'+self.influxconfig['influxdb_database']+'")\
                 |> range(start: -2d, stop: now())\
                 |> filter(fn: (r) => r["_measurement"] == "%")\
                 |> filter(fn: (r) => r["_field"] == "value")\

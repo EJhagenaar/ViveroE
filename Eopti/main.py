@@ -35,6 +35,21 @@ def root():
 def calculate():
 
     try:
+        Eopti.loadPVForecast()
+    except: Exception as error:
+        return {"status": "Error trying to load PV Forecast"}, error     
+    
+    try:
+        Eopti.loadPrices()
+    except: Exception as error:
+        return {"status": "Error trying to load prices from entso-e platform"}, error     
+    
+    try:
+        Eopti.getTempForecast()
+    except: Exception as error:
+        return {"status": "Error trying to get temperature forecast from OpenWeatherMap"}, error      
+
+    try:
         Eopti.loadEdata()
         print('excecuted Eopti.loadEdata()')
     except Exception as error:
@@ -42,7 +57,7 @@ def calculate():
         return {"status": "Error trying to load historical energy data from HA sensor and influxDB"}, error     
     
     try:
-        Eopti.getExogFut()
+        Eopti.getExogFut(temp=1)
         print('excecuted getExogFut()')
     except Exception as error:
         return {"status": "Error trying to get future external variables"}, error  

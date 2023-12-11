@@ -118,6 +118,7 @@ class Eoptimization:
     #create predicted energy consumption forecast
     def loadEdata(self):
         #get consumption
+        print("#get consumption")
         self.edata=self.getfromInflux('edata')
         self.edata.index.name='time'
         self.edata.index = self.edata.index.tz_convert(self.influxconfig['timezone'])

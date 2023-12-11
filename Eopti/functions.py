@@ -438,6 +438,7 @@ class Eoptimization:
 
     def plotOptimization(self,plot=0,show=0):
         df=self.Optimization
+        print(self.Optimization)
         if plot==1 or plot==0:
             options = {
                 "title" : "Calculated at: " + self.calculatedat.strftime('%Y-%m-%d %H:%M'),

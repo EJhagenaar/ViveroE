@@ -120,6 +120,7 @@ class Eoptimization:
         #get consumption
         print("#get consumption")
         self.edata=self.getfromInflux('edata')
+        print(self.edata)
         self.edata.index.name='time'
         self.edata.index = self.edata.index.tz_convert(self.influxconfig['timezone'])
         self.edata = self.edata.asfreq('H', fill_value=0.0).sort_index()
